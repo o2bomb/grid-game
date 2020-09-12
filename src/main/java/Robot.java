@@ -21,6 +21,10 @@ public class Robot implements Runnable {
         this.grid = grid;
     }
 
+    public int getId() {
+        return this.id;
+    }
+
     @Override
     public void run() {
         // update GUI's logger to indicate that this robot has spawned
@@ -56,22 +60,16 @@ public class Robot implements Runnable {
     }
 
     private void attemptMove() throws AlreadyOccupiedException, RobotMismatchException {
-        int newX = x + ThreadLocalRandom.current().nextInt(-1, 1 + 1); // randomly increment/decrement x by 1
-        int newY = y + ThreadLocalRandom.current().nextInt(-1, 1 + 1); // randomly increment/decrement y by 1
-
         GridSquare currSquare = grid.getGridSquare(x, y);
-        GridSquare square = grid.getGridSquare(newX, newY);
+        GridSquare newSquare = grid.getRandomAdjacentGridSquare(x, y);
 
+        System.out.println(String.format("(Robot #%d) attempting move to [%d, %d]", id, newSquare.getX(), newSquare.getY()));
+        // update new square's occupying robot
+        newSquare.setRobot(this);
         // clear the previous square's robot
         currSquare.clearRobot(this);
-        // update square's occupying robot
-        square.setRobot(this);
         // update robots position
-        x = square.getX();
-        y = square.getY();
-    }
-
-    public int getId() {
-        return this.id;
+        x = newSquare.getX();
+        y = newSquare.getY();
     }
 }

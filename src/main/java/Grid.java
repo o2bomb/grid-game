@@ -1,6 +1,7 @@
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -10,10 +11,11 @@ public class Grid implements Runnable {
     private int height;
     private long spawnDelay;
     private GridSquare[][] grid;
+    private static int robotCounter = 1;
 
     // THREADING STUFF
-    private static int robotCounter = 1;
     private ExecutorService es = new ThreadPoolExecutor(4, 8, 10, TimeUnit.SECONDS, new SynchronousQueue<>());
+    private Object monitor = new Object();
 
     public Grid() {
         this.length = 9;
@@ -55,12 +57,14 @@ public class Grid implements Runnable {
     }
     
     public GridSquare getGridSquare(int x, int y) {
-        if (x < 0) x = 0;
-        if (y < 0) y = 0;
-        if (x > length - 1) x = length - 1;
-        if (y > height - 1) y = height - 1;
-
-        return grid[x][y];
+        synchronized(monitor) {
+            if (x < 0) x = 0;
+            if (y < 0) y = 0;
+            if (x > length - 1) x = length - 1;
+            if (y > height - 1) y = height - 1;
+    
+            return grid[x][y];
+        }
     }
 
     /**
@@ -71,26 +75,28 @@ public class Grid implements Runnable {
      */
     private void attemptSpawn() {
         // what happens when gridsquare.isOccupied() then gridsquare.setRobot()?
-        for (int i = 1; i <= 4; i++) {
-            GridSquare corner = getCorner(i);
-            Robot newRobot = new Robot(robotCounter, corner.getX(), corner.getY(), this);
-            if (!corner.isOccupied()) {
-                try {
-                    // attempt to set the robot on the square
-                    corner.setRobot(newRobot);
-                    // create a new thread for the robot to run in
-                    es.submit(newRobot);
-                    // update robotCounter
-                    robotCounter++;
-                    // exit the loop (the robot has been successfully spawned)
-                    return;
-                } catch (AlreadyOccupiedException e) {
-                    // the square is already occupied; try a different square
-                    continue;
-                } catch (RejectedExecutionException e) {
-                    // the robot cannot be spawned due to constraints set for thread
-                    // spawning for the ExecutorService object; do nothing
-                    break;
+        synchronized(monitor) {
+            for (int i = 1; i <= 4; i++) {
+                GridSquare corner = getCorner(i);
+                Robot newRobot = new Robot(robotCounter, corner.getX(), corner.getY(), this);
+                if (!corner.isOccupied()) {
+                    try {
+                        // attempt to set the robot on the square
+                        corner.setRobot(newRobot);
+                        // create a new thread for the robot to run in
+                        es.submit(newRobot);
+                        // update robotCounter
+                        robotCounter++;
+                        // exit the loop (the robot has been successfully spawned)
+                        return;
+                    } catch (AlreadyOccupiedException e) {
+                        // the square is already occupied; try a different square
+                        continue;
+                    } catch (RejectedExecutionException e) {
+                        // the robot cannot be spawned due to constraints set for thread
+                        // spawning for the ExecutorService object; do nothing
+                        break;
+                    }
                 }
             }
         }
@@ -109,15 +115,31 @@ public class Grid implements Runnable {
     private GridSquare getCorner(int cornerId) {
         switch (cornerId) {
             case 1:
-                return grid[0][0];
+                return getGridSquare(0, 0);
             case 2:
-                return grid[0][height-1];
+                return getGridSquare(0, height-1);
             case 3:
-                return grid[length-1][height-1];
+                return getGridSquare(length-1, height-1);
             case 4:
-                return grid[length-1][0];
+                return getGridSquare(length-1, 0);
             default:
-                return grid[0][0];
+                return getGridSquare(0, 0);
         }
+    }
+
+    /**
+     * Returns a random grid square that is adjacent from the grid square
+     * located at the (x, y) coordinates provided. This method will never
+     * return a grid square at (x, y).
+     */
+    public GridSquare getRandomAdjacentGridSquare(int x, int y) {
+        int newX = x + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+        int newY= y + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+
+        while (getGridSquare(x, y) == getGridSquare(newX, newY)) {
+            newX = x + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+            newY = y + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+        }
+        return getGridSquare(newX, newY);
     }
 }
