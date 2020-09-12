@@ -13,6 +13,8 @@ import java.util.*;
  */
 public class JFXArena extends Pane
 {
+    private GraphicsContext gfx = null;
+
     // Represents the image to draw. You can modify this to introduce multiple images.
     private static final String IMAGE_FILE = "1554047213.png";
     private Image robot1;
@@ -48,6 +50,8 @@ public class JFXArena extends Pane
         canvas.widthProperty().bind(widthProperty());
         canvas.heightProperty().bind(heightProperty());
         getChildren().add(canvas);
+
+        gfx = canvas.getGraphicsContext2D();
     }
     
     
@@ -101,7 +105,6 @@ public class JFXArena extends Pane
     public void layoutChildren()
     {
         super.layoutChildren(); 
-        GraphicsContext gfx = canvas.getGraphicsContext2D();
         gfx.clearRect(0.0, 0.0, canvas.getWidth(), canvas.getHeight());
         
         // First, calculate how big each grid cell should be, in pixels. (We do need to do this
@@ -219,5 +222,21 @@ public class JFXArena extends Pane
                        (clippedGridY1 + 0.5) * gridSquareSize, 
                        (gridX2 + 0.5) * gridSquareSize, 
                        (gridY2 + 0.5) * gridSquareSize);
+    }
+
+    /**
+     * Draws a robot in the specified position on the grid.
+     * This method can be called many times in a row with incrementing
+     * x and y values to create a smooth robot movement transition
+     * @param x
+     * @param y
+     */
+    public void drawRobot(double x, double y, String label) {
+        drawImage(gfx, robot1, x, y);
+        drawLabel(gfx, label, x, y);
+    }
+
+    private void moveRobot(double initX, double initY, double finalX, double finalY, int transitionTime) {
+        
     }
 }

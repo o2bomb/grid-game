@@ -1,16 +1,19 @@
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class Grid implements Runnable {
+    // GRID DATA
     private int length;
     private int height;
     private long spawnDelay;
     private GridSquare[][] grid;
-    private ExecutorService es = new ThreadPoolExecutor(4, 8, 10, TimeUnit.SECONDS, new SynchronousQueue<>());
 
+    // THREADING STUFF
     private static int robotCounter = 1;
+    private ExecutorService es = new ThreadPoolExecutor(4, 8, 10, TimeUnit.SECONDS, new SynchronousQueue<>());
 
     public Grid() {
         this.length = 9;
@@ -84,6 +87,10 @@ public class Grid implements Runnable {
                 } catch (AlreadyOccupiedException e) {
                     // the square is already occupied; try a different square
                     continue;
+                } catch (RejectedExecutionException e) {
+                    // the robot cannot be spawned due to constraints set for thread
+                    // spawning for the ExecutorService object; do nothing
+                    break;
                 }
             }
         }

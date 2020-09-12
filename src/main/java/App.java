@@ -14,12 +14,10 @@ public class App extends Application
     @Override
     public void start(Stage stage) 
     {
-        Thread gridThread = new Thread(new Grid(9, 9, 2000), "Grid thread");
-        gridThread.start();
-
         stage.setTitle("Example App (JavaFX)");
-        JFXArena arena = new JFXArena();
-        arena.addListener((x, y) ->
+        
+        UIElements guiStuff = UIElements.getInstance();
+        guiStuff.getArena().addListener((x, y) ->
         {
             System.out.println("Arena click at (" + x + "," + y + ")");
         });
@@ -27,27 +25,25 @@ public class App extends Application
         ToolBar toolbar = new ToolBar();
 //         Button btn1 = new Button("My Button 1");
 //         Button btn2 = new Button("My Button 2");
-        Label label = new Label("Score: 999");
-//         toolbar.getItems().addAll(btn1, btn2, label);
-        toolbar.getItems().addAll(label);
+//         toolbar.getItems().addAll(btn1, btn2, score);
+        toolbar.getItems().addAll(guiStuff.getScore());
         
 //         btn1.setOnAction((event) ->
 //         {
 //             System.out.println("Button 1 pressed");
 //         });
-
-        TextArea logger = new TextArea();
-        logger.appendText("Hello\n");
-        logger.appendText("World\n");
         
         SplitPane splitPane = new SplitPane();
-        splitPane.getItems().addAll(arena, logger);
-        arena.setMinWidth(300.0);
+        splitPane.getItems().addAll(guiStuff.getArena(), guiStuff.getLogger());
+        guiStuff.getArena().setMinWidth(300.0);
         
         BorderPane contentPane = new BorderPane();
         contentPane.setTop(toolbar);
         contentPane.setCenter(splitPane);
         
+        Thread gridThread = new Thread(new Grid(9, 9, 2000), "Grid thread");
+        gridThread.start();
+
         Scene scene = new Scene(contentPane, 800, 800);
         stage.setScene(scene);
         stage.show();

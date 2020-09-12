@@ -30,6 +30,7 @@ public class GridSquare {
     public void clearRobot(Robot robot) throws RobotMismatchException {
         synchronized(monitor) {
             if (this.robot != robot) {
+                System.out.println(String.format("(Robot #%d) failed to remove Robot #%d", robot.getId(), this.robot.getId()));
                 throw new RobotMismatchException("Only the robot that occupies this square can remove itself");
             }
 

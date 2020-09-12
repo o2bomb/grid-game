@@ -3,11 +3,15 @@ import java.util.concurrent.ThreadLocalRandom;
 import javafx.application.Platform;
 
 public class Robot implements Runnable {
+    // ROBOT DATA
     private int id;
     private int x;
     private int y;
     private long movementDelay;
     private Grid grid; // reference to Grid object
+
+    // UI STUFF
+    UIElements ui = UIElements.getInstance();
 
     public Robot(int id, int x, int y, Grid grid) {
         this.id = id;
@@ -21,7 +25,7 @@ public class Robot implements Runnable {
     public void run() {
         // update GUI's logger to indicate that this robot has spawned
         Platform.runLater(() -> {
-
+            ui.getLogger().appendText(String.format("Robot #%d has spawned at [%d, %d]\n", id, x, y));
         });
         System.out.println(String.format("Robot #%d has spawned at [%d, %d]", id, x, y));
         try {
@@ -32,18 +36,21 @@ public class Robot implements Runnable {
                     attemptMove();
                     // perform animation of moving robot in GUI
                     Platform.runLater(() -> {
-                        
+                        ui.getArena().layoutChildren();
                     });
                 } catch (AlreadyOccupiedException e) {
                     // square is already occupied; do nothing
-                    System.out.println(String.format("(Robot #%d) a clash has occurred when trying to move from [%d, %d]", id, x, y));
+                    // System.out.println(String.format("(Robot #%d) a clash has occurred when trying to move from [%d, %d]", id, x, y));
                 } catch (RobotMismatchException e) {
                     // square cannot be cleared right now; do nothing
-                    System.out.println(String.format("(Robot #%d) failed to remove robot from [%d, %d]", id, x, y));
+                    // System.out.println(String.format("(Robot #%d) failed to remove robot from [%d, %d]", id, x, y));
                 }
                 Thread.sleep(movementDelay);
             }
         } catch (InterruptedException e) {
+            Platform.runLater(() -> {
+                ui.getLogger().appendText(String.format("Robot #%d has been destroyed\n", id));
+            });
             System.out.println(String.format("Robot #%d has exited", id));
         }
     }
