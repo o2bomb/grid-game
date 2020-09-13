@@ -41,9 +41,6 @@ public class App extends Application
         contentPane.setTop(toolbar);
         contentPane.setCenter(splitPane);
         
-        Thread gridThread = new Thread(new Grid(9, 9, 2000), "Grid thread");
-        gridThread.start();
-
         Scene scene = new Scene(contentPane, 800, 800);
         stage.setScene(scene);
         stage.show();

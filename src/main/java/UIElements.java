@@ -2,8 +2,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
 /**
- * A global singleton class that contains the logger TextArea object and 
- * score Label object
+ * A global singleton class that contains the logger TextArea object and score
+ * Label object
  */
 public class UIElements {
     // SINGLETON INSTANCE
@@ -14,27 +14,26 @@ public class UIElements {
     private TextArea logger;
     private Label score;
 
-    private UIElements() {
-        arena = new JFXArena();
+    private UIElements(Grid grid) {
+        arena = new JFXArena(grid);
         logger = new TextArea();
         score = new Label("Score: 0");
     }
 
-    public static UIElements getInstance()
-	{
-		if (instance == null)
-		{
-			synchronized(UIElements.class)
-			{
-				if (instance == null)
-				{
-					System.out.println("UIElements object initialized!");
-					instance = new UIElements();
-				}
-			}
-		}
+    public static UIElements getInstance() {
+        if (instance == null) {
+            synchronized (UIElements.class) {
+                if (instance == null) {
+                    System.out.println("UIElements object initialized!");
+                    Grid grid = new Grid(9, 9, 2000);
+                    Thread gridThread = new Thread(grid, "Grid thread");
+                    gridThread.start();
+                    instance = new UIElements(grid);
+                }
+            }
+        }
 
-		return instance;
+        return instance;
     }
 
     public JFXArena getArena() {

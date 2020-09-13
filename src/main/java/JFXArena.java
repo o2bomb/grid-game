@@ -25,6 +25,7 @@ public class JFXArena extends Pane
     private int gridHeight = 9;
     private double robotX = 1.0;
     private double robotY = 3.0;
+    private Grid grid; // reference to Grid object
 
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
@@ -34,7 +35,7 @@ public class JFXArena extends Pane
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena()
+    public JFXArena(Grid grid)
     {
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory).
@@ -52,9 +53,9 @@ public class JFXArena extends Pane
         getChildren().add(canvas);
 
         gfx = canvas.getGraphicsContext2D();
+        this.grid = grid;
     }
-    
-    
+
     /**
      * Moves a robot image to a new grid position. This is highly rudimentary, as you will need
      * many different robots in practice. This method currently just serves as a demonstration.
@@ -63,6 +64,10 @@ public class JFXArena extends Pane
     {
         robotX = x;
         robotY = y;
+        requestLayout();
+    }
+
+    public void updateRobotPositions() {
         requestLayout();
     }
     
@@ -115,8 +120,7 @@ public class JFXArena extends Pane
             
         double arenaPixelWidth = gridWidth * gridSquareSize;
         double arenaPixelHeight = gridHeight * gridSquareSize;
-            
-            
+
         // Draw the arena grid lines. This may help for debugging purposes, and just generally
         // to see what's going on.
         gfx.setStroke(Color.DARKGREY);
@@ -136,8 +140,12 @@ public class JFXArena extends Pane
 
         // Invoke helper methods to draw things at the current location.
         // ** You will need to adapt this to the requirements of your application. **
-        drawImage(gfx, robot1, robotX, robotY);
-        drawLabel(gfx, "Robot Name", robotX, robotY);
+        for (Robot r : grid.getRobots()) {
+            int robotX = r.getX();
+            int robotY = r.getY();
+            drawImage(gfx, robot1, robotX, robotY);
+            drawLabel(gfx, String.format("Robot #%d", r.getId()), robotX, robotY);
+        }
     }
     
     

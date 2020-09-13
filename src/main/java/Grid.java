@@ -1,3 +1,5 @@
+import java.util.List;
+import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
@@ -12,6 +14,7 @@ public class Grid implements Runnable {
     private long spawnDelay;
     private GridSquare[][] grid;
     private static int robotCounter = 1;
+    private List<Robot> robots = new LinkedList<>();
 
     // THREADING STUFF
     private ExecutorService es = new ThreadPoolExecutor(4, 8, 10, TimeUnit.SECONDS, new SynchronousQueue<>());
@@ -45,6 +48,7 @@ public class Grid implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("Grid thread created");
         try {
             while(true) {
                 // attempt to spawn robot
@@ -53,6 +57,12 @@ public class Grid implements Runnable {
             }
         } catch (InterruptedException e) {
             System.out.println("Grid thread has exited");
+        }
+    }
+
+    public List<Robot> getRobots() {
+        synchronized(monitor) {
+            return robots;
         }
     }
     
@@ -74,7 +84,6 @@ public class Grid implements Runnable {
      * be created for the successfully spawned robot via a thread-pool
      */
     private void attemptSpawn() {
-        // what happens when gridsquare.isOccupied() then gridsquare.setRobot()?
         synchronized(monitor) {
             for (int i = 1; i <= 4; i++) {
                 GridSquare corner = getCorner(i);
@@ -87,6 +96,8 @@ public class Grid implements Runnable {
                         es.submit(newRobot);
                         // update robotCounter
                         robotCounter++;
+                        // add the robot to the list
+                        robots.add(newRobot);
                         // exit the loop (the robot has been successfully spawned)
                         return;
                     } catch (AlreadyOccupiedException e) {

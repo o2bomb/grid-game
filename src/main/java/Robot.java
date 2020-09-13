@@ -13,6 +13,9 @@ public class Robot implements Runnable {
     // UI STUFF
     UIElements ui = UIElements.getInstance();
 
+    // THREADING STUFF
+    Object monitor = new Object();
+
     public Robot(int id, int x, int y, Grid grid) {
         this.id = id;
         this.x = x;
@@ -23,6 +26,18 @@ public class Robot implements Runnable {
 
     public int getId() {
         return this.id;
+    }
+
+    public int getX() {
+        synchronized(monitor) {
+            return this.x;
+        }
+    }
+
+    public int getY() {
+        synchronized(monitor) {
+            return this.y;
+        }
     }
 
     @Override
@@ -38,10 +53,12 @@ public class Robot implements Runnable {
                     System.out.println(String.format("(Robot #%d) is at [%d, %d]", id, x, y));
                     // attempt to move to a different square
                     attemptMove();
-                    // perform animation of moving robot in GUI
-                    Platform.runLater(() -> {
-                        ui.getArena().layoutChildren();
-                    });
+                    // request GUI to update all robot positions
+                    synchronized(monitor) {
+                        Platform.runLater(() -> {
+                            ui.getArena().updateRobotPositions();
+                        });
+                    }
                 } catch (AlreadyOccupiedException e) {
                     // square is already occupied; do nothing
                     // System.out.println(String.format("(Robot #%d) a clash has occurred when trying to move from [%d, %d]", id, x, y));
@@ -60,16 +77,18 @@ public class Robot implements Runnable {
     }
 
     private void attemptMove() throws AlreadyOccupiedException, RobotMismatchException {
-        GridSquare currSquare = grid.getGridSquare(x, y);
-        GridSquare newSquare = grid.getRandomAdjacentGridSquare(x, y);
-
-        System.out.println(String.format("(Robot #%d) attempting move to [%d, %d]", id, newSquare.getX(), newSquare.getY()));
-        // update new square's occupying robot
-        newSquare.setRobot(this);
-        // clear the previous square's robot
-        currSquare.clearRobot(this);
-        // update robots position
-        x = newSquare.getX();
-        y = newSquare.getY();
+        synchronized(monitor) {
+            GridSquare currSquare = grid.getGridSquare(x, y);
+            GridSquare newSquare = grid.getRandomAdjacentGridSquare(x, y);
+    
+            System.out.println(String.format("(Robot #%d) attempting move to [%d, %d]", id, newSquare.getX(), newSquare.getY()));
+            // update new square's occupying robot
+            newSquare.setRobot(this);
+            // clear the previous square's robot
+            currSquare.clearRobot(this);
+            // update robots position
+            x = newSquare.getX();
+            y = newSquare.getY();
+        }
     }
 }
