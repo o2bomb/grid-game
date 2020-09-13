@@ -166,13 +166,18 @@ public class Grid implements Runnable {
      * return a grid square at (x, y).
      */
     public GridSquare getRandomAdjacentGridSquare(int x, int y) {
-        int newX = x + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
-        int newY= y + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+        int diffX = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+        int diffY = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+        int newX = x + diffX;
+        int newY = y + diffY;
 
-        while (getGridSquare(x, y) == getGridSquare(newX, newY)) {
-            newX = x + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
-            newY = y + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+        while (getGridSquare(x, y) == getGridSquare(newX, newY) || Math.abs(diffX + diffY) != 1) {
+            diffX = ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+            diffY = ThreadLocalRandom.current().nextInt(-1, 1 + 1);    
+            newX = x + diffX;
+            newY = y + diffY;
         }
+        
         return getGridSquare(newX, newY);
     }
 }
