@@ -14,8 +14,8 @@ public class UIElements {
     private TextArea logger;
     private Label score;
 
-    private UIElements(Grid grid) {
-        arena = new JFXArena(grid);
+    private UIElements() {
+        arena = new JFXArena();
         logger = new TextArea();
         score = new Label("Score: 0");
     }
@@ -25,10 +25,7 @@ public class UIElements {
             synchronized (UIElements.class) {
                 if (instance == null) {
                     System.out.println("UIElements object initialized!");
-                    Grid grid = new Grid(9, 9, 2000);
-                    Thread gridThread = new Thread(grid, "Grid thread");
-                    gridThread.start();
-                    instance = new UIElements(grid);
+                    instance = new UIElements();
                 }
             }
         }

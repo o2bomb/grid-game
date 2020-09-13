@@ -28,6 +28,11 @@ public class Grid implements Runnable {
 
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < height; j++) {
+                // if (i == length / 2 &&  j == height / 2) {
+                //     grid[i][j] = new PlayerSquare(i, j, this);
+                // } else {
+                //     grid[i][j] = new GridSquare(i, j);
+                // }
                 grid[i][j] = new GridSquare(i, j);
             }
         }
@@ -41,6 +46,11 @@ public class Grid implements Runnable {
 
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < height; j++) {
+                // if (i == length / 2 &&  j == height / 2) {
+                //     grid[i][j] = new PlayerSquare(i, j, this);
+                // } else {
+                //     grid[i][j] = new GridSquare(i, j);
+                // }
                 grid[i][j] = new GridSquare(i, j);
             }
         }
@@ -87,7 +97,7 @@ public class Grid implements Runnable {
         synchronized(monitor) {
             for (int i = 1; i <= 4; i++) {
                 GridSquare corner = getCorner(i);
-                Robot newRobot = new Robot(robotCounter, corner.getX(), corner.getY(), this);
+                Robot newRobot = new Robot(robotCounter, corner.getX(), corner.getY());
                 if (!corner.isOccupied()) {
                     try {
                         // attempt to set the robot on the square

@@ -8,7 +8,7 @@ public class Robot implements Runnable {
     private int x;
     private int y;
     private long movementDelay;
-    private Grid grid; // reference to Grid object
+    private Grid grid  = GridController.getInstance().getGrid(); // reference to Grid object
 
     // UI STUFF
     UIElements ui = UIElements.getInstance();
@@ -18,12 +18,11 @@ public class Robot implements Runnable {
     // THREADING STUFF
     Object monitor = new Object();
 
-    public Robot(int id, int x, int y, Grid grid) {
+    public Robot(int id, int x, int y) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.movementDelay = ThreadLocalRandom.current().nextInt(500, 2000 + 1);
-        this.grid = grid;
 
         this.transitionX = (double)x;
         this.transitionY = (double)y;
@@ -66,6 +65,8 @@ public class Robot implements Runnable {
                     Platform.runLater(() -> {
                         ui.getArena().updateRobotPositions();
                     });
+                    // check for win condition
+                    checkIfPlayer();
                 } catch (AlreadyOccupiedException e) {
                     // square is already occupied; do nothing
                     // System.out.println(String.format("(Robot #%d) a clash has occurred when trying to move from [%d, %d]", id, x, y));
@@ -100,6 +101,17 @@ public class Robot implements Runnable {
             y = newSquare.getY();
             transitionX = newSquare.getX();
             transitionY = newSquare.getY();
+        }
+    }
+
+    private void checkIfPlayer() {
+        synchronized(monitor) {
+            GridSquare square = grid.getGridSquare(x, y);
+            if (square instanceof PlayerSquare) {
+                PlayerSquare playerSquare = (PlayerSquare)square;
+
+                playerSquare.end();
+            }
         }
     }
 

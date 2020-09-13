@@ -25,7 +25,7 @@ public class JFXArena extends Pane
     private int gridHeight = 9;
     private double robotX = 1.0;
     private double robotY = 3.0;
-    private Grid grid; // reference to Grid object
+    private Grid grid = GridController.getInstance().getGrid(); // reference to Grid object
 
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
@@ -35,7 +35,7 @@ public class JFXArena extends Pane
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena(Grid grid)
+    public JFXArena()
     {
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory).
@@ -53,7 +53,6 @@ public class JFXArena extends Pane
         getChildren().add(canvas);
 
         gfx = canvas.getGraphicsContext2D();
-        this.grid = grid;
     }
 
     /**
