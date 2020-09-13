@@ -28,12 +28,11 @@ public class Grid implements Runnable {
 
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < height; j++) {
-                // if (i == length / 2 &&  j == height / 2) {
-                //     grid[i][j] = new PlayerSquare(i, j, this);
-                // } else {
-                //     grid[i][j] = new GridSquare(i, j);
-                // }
-                grid[i][j] = new GridSquare(i, j);
+                if (i == length / 2 &&  j == height / 2) {
+                    grid[i][j] = new PlayerSquare(i, j);
+                } else {
+                    grid[i][j] = new GridSquare(i, j);
+                }
             }
         }
     }
@@ -46,12 +45,11 @@ public class Grid implements Runnable {
 
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < height; j++) {
-                // if (i == length / 2 &&  j == height / 2) {
-                //     grid[i][j] = new PlayerSquare(i, j, this);
-                // } else {
-                //     grid[i][j] = new GridSquare(i, j);
-                // }
-                grid[i][j] = new GridSquare(i, j);
+                if (i == length / 2 &&  j == height / 2) {
+                    grid[i][j] = new PlayerSquare(i, j);
+                } else {
+                    grid[i][j] = new GridSquare(i, j);
+                }
             }
         }
     }

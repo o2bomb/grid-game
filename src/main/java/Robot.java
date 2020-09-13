@@ -8,7 +8,8 @@ public class Robot implements Runnable {
     private int x;
     private int y;
     private long movementDelay;
-    private Grid grid  = GridController.getInstance().getGrid(); // reference to Grid object
+    private Grid grid = ThreadController.getInstance().getGrid(); // reference to Grid object
+    private Player player = ThreadController.getInstance().getPlayer(); // reference to Player object
 
     // UI STUFF
     UIElements ui = UIElements.getInstance();
@@ -108,9 +109,9 @@ public class Robot implements Runnable {
         synchronized(monitor) {
             GridSquare square = grid.getGridSquare(x, y);
             if (square instanceof PlayerSquare) {
-                PlayerSquare playerSquare = (PlayerSquare)square;
-
-                playerSquare.end();
+                Platform.runLater(() -> {
+                    ui.getLogger().appendText(String.format("Robot #%d has landed on the fortress!", id));
+                });
             }
         }
     }

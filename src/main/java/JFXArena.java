@@ -23,9 +23,7 @@ public class JFXArena extends Pane
     // requirements of your application.
     private int gridWidth = 9;
     private int gridHeight = 9;
-    private double robotX = 1.0;
-    private double robotY = 3.0;
-    private Grid grid = GridController.getInstance().getGrid(); // reference to Grid object
+    private Grid grid = ThreadController.getInstance().getGrid(); // reference to Grid object
 
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
@@ -53,17 +51,6 @@ public class JFXArena extends Pane
         getChildren().add(canvas);
 
         gfx = canvas.getGraphicsContext2D();
-    }
-
-    /**
-     * Moves a robot image to a new grid position. This is highly rudimentary, as you will need
-     * many different robots in practice. This method currently just serves as a demonstration.
-     */
-    public void setRobotPosition(double x, double y)
-    {
-        robotX = x;
-        robotY = y;
-        requestLayout();
     }
 
     public void updateRobotPositions() {

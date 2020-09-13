@@ -6,10 +6,6 @@ import javafx.application.Platform;
 public class Player implements Runnable {
     // PLAYER DATA
     private BlockingQueue<Shot> shots = new ArrayBlockingQueue<>(10);
-    private Grid grid = GridController.getInstance().getGrid(); // reference to Grid object
-
-    // UI STUFF
-    private UIElements ui = UIElements.getInstance();
 
     @Override
     public void run() {
@@ -23,7 +19,8 @@ public class Player implements Runnable {
             }
         } catch (InterruptedException e) {
             Platform.runLater(() -> {
-                ui.getLogger().appendText("You have died. Robots win!");
+                UIElements ui = UIElements.getInstance();
+                ui.getLogger().appendText("You have died. Robots win!\n");
             });
             System.out.println("Player thread has exited");
         }

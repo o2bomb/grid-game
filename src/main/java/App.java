@@ -16,6 +16,7 @@ public class App extends Application
     {
         stage.setTitle("Example App (JavaFX)");
         
+        ThreadController.getInstance().start();   // start the grid thread
         UIElements guiStuff = UIElements.getInstance();
         guiStuff.getArena().addListener((x, y) ->
         {
