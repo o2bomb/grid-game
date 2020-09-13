@@ -12,6 +12,8 @@ public class Robot implements Runnable {
 
     // UI STUFF
     UIElements ui = UIElements.getInstance();
+    private double transitionX;
+    private double transitionY;
 
     // THREADING STUFF
     Object monitor = new Object();
@@ -22,21 +24,28 @@ public class Robot implements Runnable {
         this.y = y;
         this.movementDelay = ThreadLocalRandom.current().nextInt(500, 2000 + 1);
         this.grid = grid;
+
+        this.transitionX = (double)x;
+        this.transitionY = (double)y;
     }
 
     public int getId() {
         return this.id;
     }
 
-    public int getX() {
+    public long getMovementDelay() {
+        return movementDelay;
+    }
+
+    public double getTransitionX() {
         synchronized(monitor) {
-            return this.x;
+            return transitionX;
         }
     }
 
-    public int getY() {
+    public double getTransitionY() {
         synchronized(monitor) {
-            return this.y;
+            return transitionY;
         }
     }
 
@@ -53,12 +62,10 @@ public class Robot implements Runnable {
                     System.out.println(String.format("(Robot #%d) is at [%d, %d]", id, x, y));
                     // attempt to move to a different square
                     attemptMove();
-                    // request GUI to update all robot positions
-                    synchronized(monitor) {
-                        Platform.runLater(() -> {
-                            ui.getArena().updateRobotPositions();
-                        });
-                    }
+                    // animate it
+                    Platform.runLater(() -> {
+                        ui.getArena().updateRobotPositions();
+                    });
                 } catch (AlreadyOccupiedException e) {
                     // square is already occupied; do nothing
                     // System.out.println(String.format("(Robot #%d) a clash has occurred when trying to move from [%d, %d]", id, x, y));
@@ -86,9 +93,41 @@ public class Robot implements Runnable {
             newSquare.setRobot(this);
             // clear the previous square's robot
             currSquare.clearRobot(this);
+            // success! now animate the robot on the gui thread
+            // animateMove(currSquare.getX(), currSquare.getY(), newSquare.getX(), newSquare.getY());
             // update robots position
             x = newSquare.getX();
             y = newSquare.getY();
+            transitionX = newSquare.getX();
+            transitionY = newSquare.getY();
+        }
+    }
+
+    private void animateMove(double initX, double initY, double finalX, double finalY) {
+        long startTime = System.currentTimeMillis();
+        long lastTime = System.currentTimeMillis();
+        long transitionTime = getMovementDelay();
+
+        double differenceX = finalX - initX;
+        double differenceY = finalY - initY;
+        double incrementX = differenceX / ((double)transitionTime / 1000.0);
+        double incrementY = differenceY / ((double)transitionTime / 1000.0);
+
+        final double ms = 1000000.0 / 20.0; // 20 fps
+        double delta = 0.0;
+        while(System.currentTimeMillis() - startTime < transitionTime){
+            long now = System.currentTimeMillis();
+            delta += (now - lastTime) / ms;
+            lastTime = now;
+            while(delta >= 1){
+                System.out.println(String.format("animating: [%d, %d]", transitionX, transitionY));
+                transitionX = initX + incrementX * ((double)(now - lastTime) / 1000.0);
+                transitionY = initY + incrementY * ((double)(now - lastTime) / 1000.0);
+
+                Platform.runLater(() -> {
+                    ui.getArena().updateRobotPositions();
+                });
+            }
         }
     }
 }
