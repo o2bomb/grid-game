@@ -110,7 +110,7 @@ public class Robot implements Runnable {
             GridSquare square = grid.getGridSquare(x, y);
             if (square instanceof PlayerSquare) {
                 Platform.runLater(() -> {
-                    ui.getLogger().appendText(String.format("Robot #%d has landed on the fortress!", id));
+                    ui.getLogger().appendText(String.format("Robot #%d has landed on the fortress!\n", id));
                 });
             }
         }

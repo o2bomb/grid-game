@@ -68,12 +68,26 @@ public class Grid implements Runnable {
         }
     }
 
+    public int getLength() {
+        return length;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public List<Robot> getRobots() {
         synchronized(monitor) {
             return robots;
         }
     }
     
+    /**
+     * Returns the GridSquare object at (x, y) coordinates
+     * @param x
+     * @param y
+     * @return A GridSquare object
+     */
     public GridSquare getGridSquare(int x, int y) {
         synchronized(monitor) {
             if (x < 0) x = 0;

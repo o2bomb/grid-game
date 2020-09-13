@@ -16,14 +16,14 @@ public class JFXArena extends Pane
     private GraphicsContext gfx = null;
 
     // Represents the image to draw. You can modify this to introduce multiple images.
-    private static final String IMAGE_FILE = "1554047213.png";
-    private Image robot1;
+    private Image robot;
+    private Image fortress;
     
     // The following values are arbitrary, and you may need to modify them according to the 
     // requirements of your application.
-    private int gridWidth = 9;
-    private int gridHeight = 9;
     private Grid grid = ThreadController.getInstance().getGrid(); // reference to Grid object
+    private int gridWidth = grid.getLength();
+    private int gridHeight = grid.getHeight();
 
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
@@ -37,13 +37,18 @@ public class JFXArena extends Pane
     {
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory).
-        
-        InputStream is = getClass().getClassLoader().getResourceAsStream(IMAGE_FILE);
+        InputStream is = getClass().getClassLoader().getResourceAsStream("1554047213.png");
         if(is == null)
         {
-            throw new AssertionError("Cannot find image file " + IMAGE_FILE);
+            throw new AssertionError("Cannot find robot image file");
         }
-        robot1 = new Image(is);
+        robot = new Image(is);
+        is = getClass().getClassLoader().getResourceAsStream("rg1024-isometric-tower.png");
+        if(is == null)
+        {
+            throw new AssertionError("Cannot find fortress image file");
+        }
+        fortress = new Image(is);
         
         canvas = new Canvas();
         canvas.widthProperty().bind(widthProperty());
@@ -124,12 +129,15 @@ public class JFXArena extends Pane
             gfx.strokeLine(0.0, y, arenaPixelWidth, y);
         }
 
+        // Draw the fortress
+        drawImage(gfx, fortress, gridWidth / 2, gridHeight / 2);
+
         // Invoke helper methods to draw things at the current location.
         // ** You will need to adapt this to the requirements of your application. **
         for (Robot r : grid.getRobots()) {
             double robotX = r.getTransitionX();
             double robotY = r.getTransitionY();
-            drawImage(gfx, robot1, robotX, robotY);
+            drawImage(gfx, robot, robotX, robotY);
             drawLabel(gfx, String.format("Robot #%d", r.getId()), robotX, robotY);
         }
     }
@@ -152,8 +160,8 @@ public class JFXArena extends Pane
         // We also need to know how "big" to make the image. The image file has a natural width 
         // and height, but that's not necessarily the size we want to draw it on the screen. We 
         // do, however, want to preserve its aspect ratio.
-        double fullSizePixelWidth = robot1.getWidth();
-        double fullSizePixelHeight = robot1.getHeight();
+        double fullSizePixelWidth = robot.getWidth();
+        double fullSizePixelHeight = robot.getHeight();
         
         double displayedPixelWidth, displayedPixelHeight;
         if(fullSizePixelWidth > fullSizePixelHeight)
