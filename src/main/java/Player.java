@@ -15,7 +15,8 @@ public class Player implements Runnable {
             while (true) {
                 // take out the next queued shot and shoot it
                 executeShot();
-                // update player's score
+                // update player's score 
+                score += 10; // score increases by 10 per second
                 updateScore();
                 // sleep thread for 1 second
                 Thread.sleep(1000);
@@ -35,6 +36,12 @@ public class Player implements Runnable {
         }
     }
 
+    /**
+     * Takes a shot out from the blocking queue and attempts to fire
+     * it. If the shot successfully hit a Robot, add to the player's
+     * existing score
+     * @throws InterruptedException
+     */
     private void executeShot() throws InterruptedException {
         Grid grid = ThreadController.getInstance().getGrid();
         Shot nextShot = shots.poll();
@@ -50,9 +57,10 @@ public class Player implements Runnable {
         }
     }
 
+    /**
+     * Updates the player's score on the GUI
+     */
     private void updateScore() {
-        score += 10; // score increases by 10 per second
-
         Platform.runLater(() -> {
             UIElements ui = UIElements.getInstance();
             ui.getScore().setText(String.format("Score: %d", score));

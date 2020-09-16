@@ -14,12 +14,13 @@ public class App extends Application
     @Override
     public void start(Stage stage) 
     {
-        stage.setTitle("Example App (JavaFX)");
+        stage.setTitle("Grid Game by Yong Yang Tan (19154970)");
         
         ThreadController.getInstance().start();   // start the grid and player thread
-        UIElements guiStuff = UIElements.getInstance();
+        UIElements guiStuff = UIElements.getInstance(); // reference to various UI elements
         guiStuff.getArena().addListener((x, y) ->
         {
+            // queue's a shot when the player clicks on a grid square
             System.out.println("Arena click at (" + x + "," + y + ")");
             Player player = ThreadController.getInstance().getPlayer();
             Shot newShot = new Shot(x, y);
@@ -27,16 +28,8 @@ public class App extends Application
         });
         
         ToolBar toolbar = new ToolBar();
-//         Button btn1 = new Button("My Button 1");
-//         Button btn2 = new Button("My Button 2");
-//         toolbar.getItems().addAll(btn1, btn2, score);
         toolbar.getItems().addAll(guiStuff.getScore());
-        
-//         btn1.setOnAction((event) ->
-//         {
-//             System.out.println("Button 1 pressed");
-//         });
-        
+                
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(guiStuff.getArena(), guiStuff.getLogger());
         guiStuff.getArena().setMinWidth(300.0);

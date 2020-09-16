@@ -13,8 +13,8 @@ public class Robot implements Runnable {
 
     // UI STUFF
     UIElements ui = UIElements.getInstance();
-    private double transitionX;
-    private double transitionY;
+    private double transitionX; // for animation
+    private double transitionY; // for animation
 
     // THREADING STUFF
     Object monitor = new Object();
@@ -52,6 +52,7 @@ public class Robot implements Runnable {
 
     @Override
     public void run() {
+        // store reference to this robot's thread
         robotThread = Thread.currentThread();
         // update GUI's logger to indicate that this robot has spawned
         Platform.runLater(() -> {
@@ -87,6 +88,13 @@ public class Robot implements Runnable {
         }
     }
 
+    /**
+     * Removes this Robot from the Grid and also destroys 
+     * the thread that posseses this Robot instance
+     * @param x
+     * @param y
+     * @throws RobotMismatchException
+     */
     public void destroy(int x, int y) throws RobotMismatchException {
         synchronized(monitor) {
             GridSquare targetSquare = grid.getGridSquare(x, y);
@@ -102,6 +110,12 @@ public class Robot implements Runnable {
         }
     }
 
+    /**
+     * This method attemps to move the robot from one GridSquare, to another randomly
+     * chosen adjacent GridSquare
+     * @throws AlreadyOccupiedException If the square is already occupied
+     * @throws RobotMismatchException
+     */
     private void attemptMove() throws AlreadyOccupiedException, RobotMismatchException {
         synchronized(monitor) {
             GridSquare currSquare = grid.getGridSquare(x, y);
@@ -122,6 +136,10 @@ public class Robot implements Runnable {
         }
     }
 
+    /**
+     * Check's if the current GridSquare is the player's fortress.
+     * If it is, print out something to the GUI to indicate that
+     */
     private void checkIfPlayer() {
         synchronized(monitor) {
             GridSquare square = grid.getGridSquare(x, y);
@@ -133,6 +151,15 @@ public class Robot implements Runnable {
         }
     }
 
+    /**
+     * THIS METHOD DOES NOT WORK
+     * Animates the robot's movement so that its transition between
+     * two grid squares is smooth
+     * @param initX
+     * @param initY
+     * @param finalX
+     * @param finalY
+     */
     private void animateMove(double initX, double initY, double finalX, double finalY) {
         long startTime = System.currentTimeMillis();
         long lastTime = System.currentTimeMillis();

@@ -2,8 +2,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
 /**
- * A global singleton class that contains the logger TextArea object and score
- * Label object
+ * A thread-safe singleton class that contains the logger TextArea object and score
+ * Label object. This object is frequently used by the GUI, player, grid, and robot
+ * threads
  */
 public class UIElements {
     // SINGLETON INSTANCE

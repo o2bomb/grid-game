@@ -1,6 +1,7 @@
 /**
  * A thread-safe singleton class that initializes a thread
- * containing the Grid and Player object
+ * containing the Grid and Player object. This object is used
+ * by the GUI, player, and robot threads
  */
 public class ThreadController {
     // SINGLETON INSTANCE

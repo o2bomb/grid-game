@@ -58,6 +58,9 @@ public class JFXArena extends Pane
         gfx = canvas.getGraphicsContext2D();
     }
 
+    /**
+     * Updates all robot's positions on the GUI
+     */
     public void updateRobotPositions() {
         requestLayout();
     }

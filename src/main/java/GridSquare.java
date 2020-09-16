@@ -1,3 +1,8 @@
+/**
+ * A thread-safe object that stores data for a given 
+ * square on the grid. This object is frequently used by the grid 
+ * and robot thread
+ */
 public class GridSquare {
     private int x;
     private int y;
