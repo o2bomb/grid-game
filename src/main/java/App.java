@@ -16,11 +16,14 @@ public class App extends Application
     {
         stage.setTitle("Example App (JavaFX)");
         
-        ThreadController.getInstance().start();   // start the grid thread
+        ThreadController.getInstance().start();   // start the grid and player thread
         UIElements guiStuff = UIElements.getInstance();
         guiStuff.getArena().addListener((x, y) ->
         {
             System.out.println("Arena click at (" + x + "," + y + ")");
+            Player player = ThreadController.getInstance().getPlayer();
+            Shot newShot = new Shot(x, y);
+            player.queueShot(newShot);
         });
         
         ToolBar toolbar = new ToolBar();

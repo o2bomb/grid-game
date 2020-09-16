@@ -79,9 +79,24 @@ public class Robot implements Runnable {
             }
         } catch (InterruptedException e) {
             Platform.runLater(() -> {
-                ui.getLogger().appendText(String.format("Robot #%d has been destroyed\n", id));
+                ui.getLogger().appendText(String.format("Robot #%d has been destroyed at [%d, %d]\n", id, x, y));
             });
             System.out.println(String.format("Robot #%d has exited", id));
+        }
+    }
+
+    public void destroy(int x, int y) throws RobotMismatchException {
+        synchronized(monitor) {
+            GridSquare targetSquare = grid.getGridSquare(x, y);
+            GridSquare currSquare = grid.getGridSquare(this.x, this.y);
+    
+            // clear robot from its currently occupied squares
+            targetSquare.clearRobot(this);
+            currSquare.clearRobot(this);
+            // then end the robot's thread
+            if (Thread.currentThread() != null) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 

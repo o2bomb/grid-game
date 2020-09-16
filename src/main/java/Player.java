@@ -27,11 +27,18 @@ public class Player implements Runnable {
     }
 
     public void queueShot(Shot newShot) {
-        shots.add(newShot);
+        if (!shots.offer(newShot)) {
+            System.out.println("Failed to add shot to queue (queue is full with max shots at 10)");
+        }
     }
 
     private void executeShot() throws InterruptedException {
-        shots.take();
+        Grid grid = ThreadController.getInstance().getGrid();
+        Shot nextShot = shots.poll();
         
+        if (nextShot != null) {
+            System.out.println("Shot was fired!");
+            grid.fireShot(nextShot);
+        }
     }
 }

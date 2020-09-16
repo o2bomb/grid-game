@@ -20,11 +20,12 @@ public class ThreadController {
         this.grid = new Grid(9, 9, 2000);
         this.player = new Player();
     }
-
+    
     public static ThreadController getInstance() {
         if (instance == null) {
             synchronized (ThreadController.class) {
                 if (instance == null) {
+                    System.out.println("Player and Grid object initialized!");
                     instance = new ThreadController();
                 }
             }
@@ -47,7 +48,7 @@ public class ThreadController {
 
         gridThread = new Thread(grid, "Grid thread");
         gridThread.start();
-        playerThread = new Thread(new Player(), "Player thread");
+        playerThread = new Thread(player, "Player thread");
         playerThread.start();
     }
 

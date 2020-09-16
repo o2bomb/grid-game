@@ -7,6 +7,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
+
 public class Grid implements Runnable {
     // GRID DATA
     private int length;
@@ -17,7 +19,7 @@ public class Grid implements Runnable {
     private List<Robot> robots = new LinkedList<>();
 
     // THREADING STUFF
-    private ExecutorService es = new ThreadPoolExecutor(4, 4, 4, TimeUnit.SECONDS, new SynchronousQueue<>());
+    private ExecutorService es = new ThreadPoolExecutor(2, 2, 4, TimeUnit.SECONDS, new SynchronousQueue<>());
     private Object monitor = new Object();
 
     public Grid() {
@@ -96,6 +98,27 @@ public class Grid implements Runnable {
             if (y > height - 1) y = height - 1;
     
             return grid[x][y];
+        }
+    }
+
+    public void fireShot(Shot firedShot) {
+        synchronized(monitor) {
+            int x = firedShot.getX();
+            int y = firedShot.getY();
+
+            Robot robot = getGridSquare(x, y).getRobot();
+            try {
+                if (robot != null) {
+                    robot.destroy(x, y);
+                } else {
+                    Platform.runLater(() -> {
+                        UIElements ui = UIElements.getInstance();
+                        ui.getLogger().appendText(String.format("A shot failed to hit any robot at [%d, %d]\n", x, y));;
+                    });
+                }
+            } catch (RobotMismatchException e) {
+                System.out.println(String.format("Failed to destroy robot at [%d, %d]", x, y));
+            }
         }
     }
 
