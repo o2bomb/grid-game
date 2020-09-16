@@ -18,6 +18,7 @@ public class Robot implements Runnable {
 
     // THREADING STUFF
     Object monitor = new Object();
+    Thread robotThread = null;
 
     public Robot(int id, int x, int y) {
         this.id = id;
@@ -51,6 +52,7 @@ public class Robot implements Runnable {
 
     @Override
     public void run() {
+        robotThread = Thread.currentThread();
         // update GUI's logger to indicate that this robot has spawned
         Platform.runLater(() -> {
             ui.getLogger().appendText(String.format("Robot #%d has spawned at [%d, %d]\n", id, x, y));
@@ -94,8 +96,8 @@ public class Robot implements Runnable {
             targetSquare.clearRobot(this);
             currSquare.clearRobot(this);
             // then end the robot's thread
-            if (Thread.currentThread() != null) {
-                Thread.currentThread().interrupt();
+            if (robotThread != null) {
+                robotThread.interrupt();
             }
         }
     }

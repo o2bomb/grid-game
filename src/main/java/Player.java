@@ -6,6 +6,7 @@ import javafx.application.Platform;
 public class Player implements Runnable {
     // PLAYER DATA
     private BlockingQueue<Shot> shots = new ArrayBlockingQueue<>(10);
+    private int score = 0;
 
     @Override
     public void run() {
@@ -14,6 +15,8 @@ public class Player implements Runnable {
             while (true) {
                 // take out the next queued shot and shoot it
                 executeShot();
+                // update player's score
+                updateScore();
                 // sleep thread for 1 second
                 Thread.sleep(1000);
             }
@@ -38,7 +41,21 @@ public class Player implements Runnable {
         
         if (nextShot != null) {
             System.out.println("Shot was fired!");
-            grid.fireShot(nextShot);
+            Robot killedRobot = grid.fireShot(nextShot);
+            // if the shot killed a robot
+            if (killedRobot != null) {
+                long t = System.currentTimeMillis() - nextShot.getCreatedAt();
+                score += 10 + 100 * (t / killedRobot.getMovementDelay()); // 10 + 100 * (t / d)
+            }
         }
+    }
+
+    private void updateScore() {
+        score += 10; // score increases by 10 per second
+
+        Platform.runLater(() -> {
+            UIElements ui = UIElements.getInstance();
+            ui.getScore().setText(String.format("Score: %d", score));
+        });
     }
 }

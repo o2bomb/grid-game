@@ -1,6 +1,7 @@
 import java.util.List;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,6 +21,7 @@ public class Grid implements Runnable {
 
     // THREADING STUFF
     private ExecutorService es = new ThreadPoolExecutor(2, 2, 4, TimeUnit.SECONDS, new SynchronousQueue<>());
+    private List<Future<?>> robotTasks = new LinkedList<>();
     private Object monitor = new Object();
 
     public Grid() {
@@ -101,24 +103,43 @@ public class Grid implements Runnable {
         }
     }
 
-    public void fireShot(Shot firedShot) {
+    /**
+     * Fires a shot at a given grid square, and returns the Robot that
+     * was killed by the shot. If no Robot was hit, returns null.
+     * Killing a Robot ends its thread.
+     * @param firedShot
+     * @return The killed Robot
+     */
+    public Robot fireShot(Shot firedShot) {
         synchronized(monitor) {
             int x = firedShot.getX();
             int y = firedShot.getY();
+            Robot killedRobot = null;
 
             Robot robot = getGridSquare(x, y).getRobot();
             try {
                 if (robot != null) {
+                    // end the robot's thread
                     robot.destroy(x, y);
+                    // remove the robot from the list (thus removing it from the GUI)
+                    robots.remove(robot);
+                    // indicate that the shot was successful
+                    killedRobot = robot;
+                    // update GUI to remove the robot
+                    Platform.runLater(() -> {
+                        UIElements ui = UIElements.getInstance();
+                        ui.getArena().updateRobotPositions();
+                    });
                 } else {
                     Platform.runLater(() -> {
                         UIElements ui = UIElements.getInstance();
-                        ui.getLogger().appendText(String.format("A shot failed to hit any robot at [%d, %d]\n", x, y));;
+                        ui.getLogger().appendText(String.format("A shot failed to hit any robot at [%d, %d]\n", x, y));
                     });
                 }
             } catch (RobotMismatchException e) {
                 System.out.println(String.format("Failed to destroy robot at [%d, %d]", x, y));
             }
+            return killedRobot;
         }
     }
 
@@ -138,7 +159,7 @@ public class Grid implements Runnable {
                         // attempt to set the robot on the square
                         corner.setRobot(newRobot);
                         // create a new thread for the robot to run in
-                        es.submit(newRobot);
+                        robotTasks.add(es.submit(newRobot));
                         // update robotCounter
                         robotCounter++;
                         // add the robot to the list
