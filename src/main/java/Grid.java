@@ -21,7 +21,7 @@ public class Grid implements Runnable {
     private List<Robot> robots = new LinkedList<>();
 
     // THREADING STUFF
-    private ExecutorService es = new ThreadPoolExecutor(2, 2, 4, TimeUnit.SECONDS, new SynchronousQueue<>());
+    private ExecutorService es = new ThreadPoolExecutor(4, 4, 4, TimeUnit.SECONDS, new SynchronousQueue<>());
     private List<Future<?>> robotTasks = new LinkedList<>();
     private Object monitor = new Object();
 

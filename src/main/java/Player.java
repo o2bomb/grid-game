@@ -25,6 +25,7 @@ public class Player implements Runnable {
             Platform.runLater(() -> {
                 UIElements ui = UIElements.getInstance();
                 ui.getLogger().appendText("You have died. Robots win!\n");
+                // TODO: print player's score on GUI
             });
             System.out.println("Player thread has exited");
         }

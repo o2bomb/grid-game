@@ -141,6 +141,7 @@ public class Robot implements Runnable {
      * If it is, print out something to the GUI to indicate that
      */
     private void checkIfPlayer() {
+        // TODO: end the player thread if its a PlayerSquare
         synchronized(monitor) {
             GridSquare square = grid.getGridSquare(x, y);
             if (square instanceof PlayerSquare) {
