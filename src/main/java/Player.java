@@ -8,8 +8,13 @@ public class Player implements Runnable {
     private BlockingQueue<Shot> shots = new ArrayBlockingQueue<>(10);
     private int score = 0;
 
+    // THREADING STUFF
+    private Thread playerThread = null;
+
     @Override
     public void run() {
+        // store reference to this robot's thread
+        playerThread = Thread.currentThread();
         System.out.println("Player thread created");
         try {
             while (true) {
@@ -25,9 +30,18 @@ public class Player implements Runnable {
             Platform.runLater(() -> {
                 UIElements ui = UIElements.getInstance();
                 ui.getLogger().appendText("You have died. Robots win!\n");
-                // TODO: print player's score on GUI
+                ui.getLogger().appendText(String.format("You final score was: %d\n", score));
             });
             System.out.println("Player thread has exited");
+        }
+    }
+
+    /**
+     * Ends the thread that posseses this player instance
+     */
+    public void end() {
+        if (playerThread != null) {
+            playerThread.interrupt();
         }
     }
 
