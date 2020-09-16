@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -80,9 +81,12 @@ public class Grid implements Runnable {
         return height;
     }
 
+    /**
+     * Returns a copy of the robots list
+     */
     public List<Robot> getRobots() {
         synchronized(monitor) {
-            return robots;
+            return Collections.unmodifiableList(robots);
         }
     }
     
