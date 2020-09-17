@@ -158,7 +158,7 @@ public class Grid implements Runnable {
             for (int i = 1; i <= 4; i++) {
                 GridSquare corner = getCorner(i);
                 Robot newRobot = new Robot(robotCounter, corner.getX(), corner.getY());
-                if (!corner.isOccupied()) {
+                if (!corner.isOccupied() && robots.size() < 4) {
                     try {
                         // attempt to set the robot on the square
                         corner.setRobot(newRobot);
